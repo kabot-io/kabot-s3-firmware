@@ -88,7 +88,7 @@ void setup() {
     Serial.print(SSID);
     Serial.println("'");
     WiFi.begin(SSID, PASS);
-    delay(100);
+    delay(1000);
   }
   // statusLed.cancel();
   // statusLed.fade(0, 255, 500);

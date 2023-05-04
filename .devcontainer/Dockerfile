@@ -18,10 +18,15 @@ RUN apt-get update \
     srecord \
     udev \
     xz-utils \
+    usbutils \
+    vim \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-USER $USERNAME
+
 
 RUN curl -fLo /etc/udev/rules.d/99-platformio-udev.rules --create-dirs https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/system/99-platformio-udev.rules
+RUN echo 'SUBSYSTEMS=="usb", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="1001", MODE:="0666"' > /etc/udev/rules.d/99-kabot.rules
+
+USER $USERNAME

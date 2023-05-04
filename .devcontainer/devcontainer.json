@@ -3,8 +3,21 @@
 {
 	"name": "Kabot firmware development container",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"dockerFile": "Dockerfile"
-	
+	"dockerFile": "Dockerfile",
+
+	"customizations": {
+		"vscode": {
+		  "settings": {},
+		  "extensions": [ "platformio.platformio-ide" ]
+		}
+	},
+
+	"privileged": true,
+
+	"mounts": [
+		"source=/dev/,target=/dev/,type=bind,consistency=consistent"
+	],
+	"postAttachCommand": "sudo service udev restart"
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 

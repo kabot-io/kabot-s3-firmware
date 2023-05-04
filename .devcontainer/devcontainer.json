@@ -8,7 +8,7 @@
 	"customizations": {
 		"vscode": {
 		  "settings": {},
-		  "extensions": [ "platformio.platformio-ide" ]
+		  "extensions": [ "platformio.platformio-ide", "ms-azuretools.vscode-docker" ]
 		}
 	},
 

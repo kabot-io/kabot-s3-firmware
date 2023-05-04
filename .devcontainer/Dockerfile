@@ -1,4 +1,5 @@
-FROM mcr.microsoft.com/devcontainers/base:focal
+# FROM mcr.microsoft.com/devcontainers/base:focal
+FROM ros:foxy
 
 RUN apt-get update \
     && apt-get -qqy install \

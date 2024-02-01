@@ -1,0 +1,29 @@
+name: Task
+description: Create a new task 
+title: "[Task]: "
+labels: [ ]
+projects: ["kabot-io/2"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for take your time
+    validations:
+      required: false
+  - type: textarea
+    id: task_desc
+    attributes:
+      label: Description
+      description: Informations about task
+      placeholder: Write something ...
+    validations:
+      required: true
+  - type: textarea
+    id: task_dod
+    attributes:
+      label: DOD
+      description: Definition of done
+      placeholder: What should be done?
+    validations:
+      required: true
+

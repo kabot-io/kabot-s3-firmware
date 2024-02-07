@@ -1,51 +1,9 @@
-<p align="center">
-<img src="docs/img/kabot-logo.png" alt= “” width="100">
-</p>
+# Kabbot - lowering entry barrier for ROS2
 
+### Mission
+The Kabot robot is a hardware and software solution that lowers the entry barrier to Robot Operating System 2 (ROS2) and provides an expandable platform for makers, students and educators. One of the main obstacles in the adoption of ROS2 by beginners is the high knowledge barrier needed to setup and start tinkering - Kabot mission is to bring batteries included in a box. Think of using Arduino instead of setting up whole toolchain and build system.
 
-# Kabot ESP32-S3 firmware repository
+### Concept
+The robot is a simple differential drive robot with expansion port for connecting external sensors and actuators, and instead of classic internal odometry sensors uses external camera to track itself in the world. Main goals are to create as simple (thus cost effective) hardware, move as much of heavy lifting as possible to the host PC instead of the robot itself and provide user with simple software environment.
 
-<p align="center">
-<img src="docs/img/kabot-esp32-s3.jpg" alt= “” width="500">
-</p>
-
-## What is this repo?
-
-This is a scratchpad repo of new release of [Kabot](https://github.com/kabot-io/POC) firmware for ESP32-S3 board. Key features:
-- as simple setup as possible - [just VSCode with Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers) plugin
-- cross platform - Linux, and hopefully Windows and other *nix systems (other than linux untested)
-- ease of development - built using [PlatformIO](https://platformio.org/)
-
-## Running:
-
-Follow those steps to set up development environment:
-
-1. [Install VSCode](https://code.visualstudio.com/) and [Docker](https://www.docker.com/) - we'll be using [Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers) plugin, so follow instructions there.
-
-2. Clone the repository: 
-```bash
-git clone https://github.com/kabot-io/kabot-s3-firmware.git
-```
-3. Open workspace in VSCode:
-```bash
-code ./kabot-s3-firmware/kabot-s3.code-workspace
-```
-
-Say **say yes to opening workspace in Dev Container.**:
-
-![Say yes](docs/img/dev-containers-reopen.png)
-
-First build of the container may take quite a few minutes, depending on your Internet connection.
-
-
-7. Type `F1` -> `PlatformIO: Build` or `Ctrl + Alt + B` - first build may take a while - PlatformIO needs to download all its dependancies; toolchain, libraries, tools etc.
-
-![Build](docs/img/platformio-build.png)
-
-8. Connect Kabot to USB using USB-C cable.
-
-9. Type `F1` -> `PlatformIO: Upload` or `Ctrl + Alt + U` to upload firmware to board.
-
-![Build](docs/img/platformio-upload.png)
-
-10. You are all set! Happy tinkering. You may start by looking into [micro-ROS documentation](https://micro.ros.org/).
+Price point at target is less than 50$. Given current availability and prices of ARM SBCs that can run ROS (e.g. Raspberry Pi) embedding one in a robot was not viable option. What if the robot itself was dumb effector, and its brain was running on a PC, that everybody has? This way, the electronics and firmware would just subscribe to and publish data to the way beefier computer, and on this computer we'd have virtual agent that looks like a real robot for the end user. Mandatory thing on a robot that can localize itself in the world is odometry. Unforntunately, encoders with proper resolution for the task can cost a significant amount of money, thus an idea of external localization was born - e.g. external camera that looks at the robot (a webcam or a smartphone with RTSP stream app).

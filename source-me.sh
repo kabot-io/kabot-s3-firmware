@@ -52,7 +52,7 @@ show_services(){
 
 init_agent(){
   cd src
-  sudo apt update && rosdep update
+  sudo apt update && rosdep update && sudo apt upgrade
   rosdep install --from-paths src --ignore-src -y
   sudo apt-get install python3-pip
   colcon build
@@ -62,7 +62,13 @@ init_agent(){
   ros2 run micro_ros_setup build_agent.sh
 }
 
-run_agent(){
+run_agent_usb(){
+  source install/local_setup.bash
+  sudo chmod 666 /dev/ttyACM0
+  ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
+}
+
+run_agent_remote(){
   source install/local_setup.bash
   ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
 }

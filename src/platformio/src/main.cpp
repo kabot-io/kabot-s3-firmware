@@ -40,12 +40,22 @@ rclc_support_t support;
 rcl_allocator_t allocator;
 rcl_node_t node;
 
+#define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){error_loop();}}
+#define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
+
+// Error handle loop
+void error_loop() {
+	while(1) {
+		delay(100);
+	}
+}
+
 // static constexpr auto pin = 40;
 static constexpr auto left_pin = 15;
 static constexpr auto right_pin = 16;
 
-static char const SSID[] = "kabot";  /* your network SSID (name) */
-static char const PASS[] = "kabot";  /* your network password (use for WPA, or use as key for WEP) */
+static char  SSID[] = "kabot";  /* your network SSID (name) */
+static char  PASS[] = "kabot";  /* your network password (use for WPA, or use as key for WEP) */
 
 Servo left;
 Servo right;
@@ -130,6 +140,16 @@ void setup() {
 
 
   xTaskCreate(handleTelnet, "Handle telnet", 1024*8, nullptr, 1, nullptr);
+
+  IPAddress agent_ip(192, 168, 1, 187);
+  size_t agent_port = 8888;
+  set_microros_wifi_transports(SSID, PASS, agent_ip, agent_port);
+	allocator = rcl_get_default_allocator();
+	// create init_options
+	RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
+
+	// create node
+	RCCHECK(rclc_node_init_default(&node, "kabot", "", &support));
 }
 
 void loop() {
@@ -137,7 +157,8 @@ void loop() {
 
   auto battery = analogRead(7) / 3400.0 * 4.2;
   telnet.printf("Battery level: %.2f \n", battery);
-  delay(1000);
+  delay(100);
+	RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100)));
 
   // uint32_t chipId = 0;
 

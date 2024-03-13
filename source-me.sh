@@ -5,22 +5,11 @@ kill_gazebo(){
   pkill -f gzclient
 }
 
-launch_creator(){
-  colcon build
-  source install/setup.bash
-  ~/Qt/Tools/QtCreator/bin/qtcreator
-}
-
 launch_kabot(){
   kill_gazebo
   colcon build --symlink-install
   source install/setup.bash
-  echo ""
-  echo ""
-  ros2 launch kabot_launcher kabot.launch.py --show-args
-  echo ""
-  echo ""
-  ros2 launch kabot_launcher kabot.launch.py
+  ros2 launch kabot_launcher kabot_core.launch.py
 }
 
 launch_kabot_foxglove(){

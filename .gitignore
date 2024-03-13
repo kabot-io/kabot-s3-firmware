@@ -6,3 +6,4 @@
 build
 log
 install
+src/platformio/include/secrets.h

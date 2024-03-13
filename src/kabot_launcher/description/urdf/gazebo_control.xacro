@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- DIFF DRIVE SIMULATION -->
+    <gazebo>
+        <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
+            <left_joint>left_wheel_joint</left_joint>
+            <right_joint>right_wheel_joint</right_joint>
+            <wheel_separation>0.13</wheel_separation>
+            <wheel_diameter>0.07</wheel_diameter>
+
+            <max_wheel_torque>1</max_wheel_torque>
+            <max_wheel_acceleration>0.5</max_wheel_acceleration>
+
+            <odometry_frame>odom</odometry_frame>
+            <robot_base_frame>base_link</robot_base_frame>
+
+            <publish_odom>true</publish_odom>
+            <publish_odom_tf>true</publish_odom_tf>
+            <publish_wheel_tf>true</publish_wheel_tf>
+        </plugin>
+    </gazebo>
+
+    <!-- ARUCO SIMULATION-->
+    <link name="aruco_link">
+        <visual>
+            <geometry>
+                <mesh filename="file://$(find kabot_launcher)/description/meshes/aruco.dae" scale="0.03 0.03 0.03"/>
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <box size="0.05 0.05 0.01"/>            
+            </geometry>
+        </collision>
+        <xacro:inertial_box mass="0.0001" x="0.0001" y="0.0001" z="0.0001">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:inertial_box>
+    </link>
+    <gazebo reference="aruco_link">
+        <material>aruco</material>
+    </gazebo>
+    <joint name="aruco_link" type="fixed">
+        <parent link="chassis_link"/>
+        <child link="aruco_link"/>
+        <origin xyz="0 0 0.036" rpy="0 ${pi} 0"/>
+    </joint>
+</robot>

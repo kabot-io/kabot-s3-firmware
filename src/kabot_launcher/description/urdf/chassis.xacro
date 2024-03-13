@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:include filename="inertial_macros.xacro"/>
+  <xacro:include filename="materials.xacro"/>
+
+  <xacro:property name="chassis_radius" value="0.06"/>
+  <xacro:property name="chassis_height" value="0.07"/>
+
+  <link name="base_link"></link>
+  <link name="footprint_link"></link>
+  <link name="chassis_link">
+    <visual>
+      <geometry>
+        <cylinder radius="${chassis_radius}" length="${chassis_height}"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="${chassis_radius}" length="${chassis_height}"/>
+      </geometry>
+    </collision>
+    <xacro:inertial_cylinder mass="0.1" radius="${chassis_radius}" length="${chassis_height}">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:inertial_cylinder>
+  </link>
+
+  <joint name="footprint_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="footprint_link"/>
+    <origin xyz="0.0 0.0 -${chassis_height/2}"/>
+  </joint>
+
+  <joint name="chassis_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="chassis_link"/>
+    <origin xyz="0.0 0.0 0.0"/>
+  </joint>
+
+  <gazebo reference="chassis_link">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+</robot>

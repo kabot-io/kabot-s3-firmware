@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"  name="kabot">
+    <xacro:include filename="chassis.xacro"/>
+    <xacro:include filename="wheel.xacro"/>
+
+    <xacro:wheel name="left_wheel" origin="0 ${chassis_radius+0.005} -0.005" parent="chassis_link" direction="1"/>
+    <xacro:wheel name="right_wheel" origin="0 -${chassis_radius+0.005} -0.005" parent="chassis_link" direction="1"/>
+
+    <xacro:include filename="gazebo_control.xacro"/>
+</robot>

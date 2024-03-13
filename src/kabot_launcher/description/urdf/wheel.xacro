@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:include filename="inertial_macros.xacro"/>
+    <xacro:macro name="wheel" params="origin name parent joint_type='continuous' direction wheel_radius=0.035 wheel_height=0.005">
+        <link name="${name}_link">
+            <visual>
+                <geometry>
+                    <cylinder radius="${wheel_radius}" length="${wheel_height}"/>
+                </geometry>
+                <material name="blue"/>
+            </visual>
+            <collision>
+                <geometry>
+                    <cylinder radius="${wheel_radius}" length="${wheel_height}"/>
+                </geometry>
+            </collision>
+            <xacro:inertial_cylinder mass="0.1" radius="${wheel_radius}" length="${wheel_height}">
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+            </xacro:inertial_cylinder>
+        </link>
+
+        <joint name="${name}_joint" type="${joint_type}">
+            <parent link="${parent}"/>
+            <child link="${name}_link"/>
+            <origin xyz="${origin}" rpy="-${pi/2} 0 0"/>
+            <axis xyz="0 0 ${direction}"/>
+        </joint>
+
+        <gazebo reference="${name}_link">
+            <material>Gazebo/Blue</material>
+        </gazebo>
+    </xacro:macro>
+</robot>

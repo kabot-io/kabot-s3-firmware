@@ -11,11 +11,18 @@ import xacro
 def generate_launch_description():
     kabot_launcher_dir = get_package_share_directory('kabot_launcher')
 
-    uros_agent = Node(
+    uros_agent_wifi = Node(
         package='micro_ros_agent',
         executable='micro_ros_agent',
         name='kabot_agent',
         arguments=["udp4", "-p", "8888", "-v6"]
+    )
+
+    uros_agent_serial= Node(
+        package='micro_ros_agent',
+        executable='micro_ros_agent',
+        name='kabot_agent',
+        arguments=["serial", "--dev", "/dev/ttyACM0"]
     )
 
     kabot_xacro_file_path = os.path.join(kabot_launcher_dir, 'description', 'urdf', 'kabot.urdf.xacro')
@@ -36,7 +43,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        uros_agent,
+        uros_agent_serial,
         kabot_state_publisher,
         teleop_joy
     ])

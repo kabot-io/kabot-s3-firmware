@@ -62,13 +62,13 @@ init_agent(){
   ros2 run micro_ros_setup build_agent.sh
 }
 
-run_agent_usb(){
+run_agent_serial(){
   source install/local_setup.bash
   sudo chmod 666 /dev/ttyACM0
   ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 }
 
-run_agent_remote(){
+run_agent_wifi(){
   source install/local_setup.bash
   ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
 }

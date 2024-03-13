@@ -27,9 +27,7 @@
 #include <rclc/executor.h>
 #include <geometry_msgs/msg/twist.h>
 
-#if !defined(MICRO_ROS_TRANSPORT_ARDUINO_WIFI)
-#error This example is only avaliable for Arduino framework with wifi transport.
-#endif
+#include "secrets.h"
 
 rcl_publisher_t publisher;
 rcl_subscription_t subscriber;
@@ -50,151 +48,47 @@ void error_loop() {
 	}
 }
 
-// static constexpr auto pin = 40;
-static constexpr auto left_pin = 15;
-static constexpr auto right_pin = 16;
-
-static char  SSID[] = "kabot";  /* your network SSID (name) */
-static char  PASS[] = "kabot";  /* your network password (use for WPA, or use as key for WEP) */
-
-Servo left;
-Servo right;
-
-EasyLed navigationLights(40, EasyLed::ActiveLevel::High, EasyLed::State::Off);
-// EasyLed statusLed(41, EasyLed::ActiveLevel::High, EasyLed::State::Off);
-ezLED statusLed(41);
-
-ESPTelnet telnet;
-
-void handleTelnet(void * parameter){
-
-  for(;;){ // infinite loop
-
-    telnet.loop();
-    vTaskDelay(10 / portTICK_PERIOD_MS);
-  }
+void subscription_callback(const void * msgin)
+{
+	const geometry_msgs__msg__Twist * msg = (const geometry_msgs__msg__Twist *)msgin;
+	RCSOFTCHECK(rcl_publish(&publisher, &msg, NULL)); //debug callback
 }
 
-void handleLed(void * parameter){
-
-  bool isFadedIn = false;
-
-  for(;;){ // infinite loop
-
-    auto isConnected = WiFi.status() != WL_CONNECTED;
-
-    auto fadeTime = isConnected ? 100 : 1000;
-
-    if (statusLed.getState() == LED_IDLE) {
-      if (isFadedIn == false) {
-        statusLed.fade(0, 255, fadeTime);
-        isFadedIn = true;
-      } else {
-        statusLed.fade(255, 0, fadeTime);
-        isFadedIn = false;
-      }
-    }
-
-    statusLed.loop();
-    vTaskDelay(30 / portTICK_PERIOD_MS);
-  }
-}
-
-void setup() {
-
-  xTaskCreate(handleLed, "Handle statusLed", 1024*8, nullptr, 1, nullptr);
-
-  Serial.begin(9600);
-  Serial.setDebugOutput(true);
-  telnet.begin();
-  
-  // while(!Serial);
-
-  
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    Serial.print("Attempting to connect to '");
-    Serial.print(SSID);
-    Serial.println("'");
-    WiFi.begin(SSID, PASS);
-    delay(1000);
-  }
-  // statusLed.cancel();
-  // statusLed.fade(0, 255, 500);
-
-  Serial.print  ("You're connected to '");
-  Serial.print  (WiFi.SSID());
-  Serial.println("'");
-
-
-  auto lok = left.attach(left_pin);
-  auto rok = right.attach(right_pin);
-  
-  telnet.begin(23);
-  delay(3000);
-  Serial.println(WiFi.localIP());
-
-
-  telnet.onConnect([](String ip){ navigationLights.on(); });
-  telnet.onDisconnect([](String ip){ navigationLights.off(); });
-
-
-  xTaskCreate(handleTelnet, "Handle telnet", 1024*8, nullptr, 1, nullptr);
-
-  IPAddress agent_ip(192, 168, 1, 187);
+void setup()
+{
+  #if defined(MICRO_ROS_TRANSPORT_ARDUINO_WIFI)
+  IPAddress agent_ip(192, 168, 1, 12);
   size_t agent_port = 8888;
   set_microros_wifi_transports(SSID, PASS, agent_ip, agent_port);
-	allocator = rcl_get_default_allocator();
-	// create init_options
-	RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
+  #endif
 
-	// create node
+  #if defined(MICRO_ROS_TRANSPORT_ARDUINO_SERIAL)
+  Serial.begin(115200);
+  Serial.print("Init uros");
+  set_microros_serial_transports(Serial);
+  #endif
+
+	allocator = rcl_get_default_allocator();
+	RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
 	RCCHECK(rclc_node_init_default(&node, "kabot", "", &support));
+
+	RCCHECK(rclc_publisher_init_default(
+		&publisher,
+		&node,
+		ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
+		"/cmd_vel_callback"));
+
+	RCCHECK(rclc_subscription_init_default(
+		&subscriber,
+		&node,
+		ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
+		"/cmd_vel"));
+
+  RCCHECK(rclc_executor_init(&executor, &support.context, 1, &allocator));
+  RCCHECK(rclc_executor_add_subscription(&executor, &subscriber, &msg, &subscription_callback, ON_NEW_DATA));
 }
 
 void loop() {
-
-
-  auto battery = analogRead(7) / 3400.0 * 4.2;
-  telnet.printf("Battery level: %.2f \n", battery);
   delay(100);
 	RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100)));
-
-  // uint32_t chipId = 0;
-
-	// for(int i=0; i<17; i=i+8) {
-	//   chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
-	// }
-
-  // Serial.print("Chip ID: "); Serial.println(chipId);
-	// Serial.printf("ESP32 Chip model = %s Rev %d\n", ESP.getChipModel(), ESP.getChipRevision());
-	// Serial.printf("This chip has %d cores\n", ESP.getChipCores());
-  // Serial.printf("Psram size %d\n", ESP.getPsramSize());
-  // Serial.println(WiFi.localIP());
-
-  // delay(1000);
-
-  // digitalWrite(pin, LOW);
-
-  // left.write(10);
-  // right.write(170);
-
-  // delay(1000);
-
-  // left.write(90);
-  // right.write(90);
-
-  // delay(1000);
-
-  // digitalWrite(pin, HIGH);
-
-  // left.write(170);
-  // right.write(10);
-
-  // delay(1000);
-
-  // left.write(90);
-  // right.write(90);
-
-  // delay(1000);
 }
